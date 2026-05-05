@@ -1,5 +1,5 @@
-// const API_BASE_URL = 'http://localhost:3002/backend/api';
-const API_BASE_URL = 'https://genzgifts.com/backend/api';
+const API_BASE_URL = 'http://localhost:3002/backend/api';
+// const API_BASE_URL = 'https://genzgifts.com/backend/api';
 
 interface ApiResponse<T> {
   data?: T;
@@ -239,6 +239,37 @@ class ApiClient {
       return { error: error instanceof Error ? error.message : 'Network error' };
     }
   }
+
+  // Bundle Image Upload
+  async uploadBundleImage(file: File): Promise<{ url?: string; error?: string }> {
+    try {
+      const token = localStorage.getItem('access_token');
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${this.baseUrl}/bundles/upload`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        return { error: error.error || 'Upload failed' };
+      }
+
+      const data = await response.json();
+      return { url: data.url };
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : 'Network error' };
+    }
+  }
+
 
   // Multiple Image Upload
   async uploadMultipleImages(files: File[]): Promise<{ urls?: string[]; error?: string }> {

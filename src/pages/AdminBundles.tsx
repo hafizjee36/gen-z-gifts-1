@@ -54,7 +54,7 @@ const AdminBundles = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const res = await api.uploadImage(file);
+    const res = await api.uploadBundleImage(file);
     if (res.url) {
       setForm(f => ({ ...f, image_url: res.url! }));
     } else {
@@ -62,6 +62,7 @@ const AdminBundles = () => {
     }
     setUploading(false);
   };
+
 
   const handleSave = async () => {
     if (!form.name.trim()) {

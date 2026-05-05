@@ -1,6 +1,43 @@
 const express = require('express');
 const db = require('../db');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadsDir = path.join(__dirname, '../../public/bundles');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, uniqueSuffix + ext);
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    if (extname && mimetype) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'));
+    }
+  }
+});
+
 const router = express.Router();
+
 
 // Get all bundles (admin - all bundles, ordered by display_order)
 router.get('/bundles', async (req, res) => {
@@ -111,6 +148,27 @@ router.put('/bundles/:id', async (req, res) => {
   }
 });
 
+// Image upload endpoint for bundles
+router.post('/bundles/upload', upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+    const uploadedFile = {
+      url: `/public/bundles/${req.file.filename}`,
+      filename: req.file.filename
+    };
+    res.json({
+      success: true,
+      url: uploadedFile.url,
+      filename: uploadedFile.filename
+    });
+  } catch (error) {
+    console.error('Bundle upload error:', error);
+    res.status(500).json({ error: 'Upload failed' });
+  }
+});
+
 // Delete bundle
 router.delete('/bundles/:id', async (req, res) => {
   try {
@@ -133,4 +191,5 @@ router.delete('/bundles/:id', async (req, res) => {
 });
 
 module.exports = router;
+
 
