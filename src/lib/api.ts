@@ -1,5 +1,5 @@
-const API_BASE_URL = 'http://localhost:3002/backend/api';
-// const API_BASE_URL = 'https://genzgifts.com/backend/api';
+// const API_BASE_URL = 'http://localhost:3002/backend/api';
+const API_BASE_URL = 'https://genzgifts.com/backend/api';
 
 interface ApiResponse<T> {
   data?: T;
