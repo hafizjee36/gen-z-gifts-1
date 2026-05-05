@@ -41,6 +41,7 @@ const trackOrderRouter = require('./routes/trackOrder');
 const couponsRouter = require('./routes/coupons');
 const visitorsRouter = require('./routes/visitors');
 const bannersRouter = require('./routes/banners');
+const bundlesRouter = require('./routes/bundles');
 
 app.get('/backend', (req, res) => {
     res.json({ 
@@ -65,6 +66,7 @@ app.use('/backend/api', trackOrderRouter);
 app.use('/backend/api', couponsRouter);
 app.use('/backend/api', visitorsRouter);
 app.use('/backend/api', bannersRouter);
+app.use('/backend/api', bundlesRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

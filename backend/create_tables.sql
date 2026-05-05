@@ -170,3 +170,23 @@ INSERT INTO products (name, description, price, image_url, category, stock, is_a
 ('Polaroid Photo Printer', 'Print your favorite memories instantly with this portable mini photo printer. Connects via Bluetooth.', 69.99, 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&h=400&fit=crop', 'Tech', 15, 1),
 ('Friendship Bracelet Kit', 'DIY friendship bracelet making kit with beads, threads, and charms. Make memories with your squad!', 16.99, 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400&h=400&fit=crop', 'DIY', 60, 1),
 ('Sunset Lamp', 'The viral sunset projection lamp for dreamy golden hour vibes any time of day.', 22.99, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop', 'Home', 35, 1);
+
+-- Bundles table for gift bundles
+CREATE TABLE IF NOT EXISTS bundles (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  name VARCHAR(255) NOT NULL,
+  image_url VARCHAR(500) NOT NULL DEFAULT '',
+  min_items INT NOT NULL DEFAULT 3 CHECK (min_items >= 1),
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  display_order INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_display_order (display_order),
+  INDEX idx_is_active (is_active)
+);
+
+-- Insert sample bundles
+INSERT INTO bundles (name, image_url, min_items, is_active, display_order) VALUES
+('Birthday Surprise', '/placeholder.svg', 3, 1, 0),
+('Bestie Gift Box', '/placeholder.svg', 4, 1, 1),
+('Self-Care Bundle', '/placeholder.svg', 2, 1, 2);

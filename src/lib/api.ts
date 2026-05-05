@@ -1,5 +1,5 @@
-// const API_BASE_URL = 'http://localhost:3002/backend/api';
-const API_BASE_URL = 'https://genzgifts.com/backend/api';
+const API_BASE_URL = 'http://localhost:3002/backend/api';
+// const API_BASE_URL = 'https://genzgifts.com/backend/api';
 
 interface ApiResponse<T> {
   data?: T;
@@ -45,7 +45,7 @@ class ApiClient {
     return this.request('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
-    });
+    }); 
   }
 
   async register(email: string, password: string) {
@@ -525,48 +525,35 @@ const uploadPromises = files.map(async (file) => {
     });
   }
 
-  // ===== Bundles (queried directly via Supabase) =====
+  // Bundles
   async getBundles() {
-    const { supabase } = await import('@/integrations/supabase/client');
-    const { data, error } = await supabase
-      .from('bundles')
-      .select('*')
-      .eq('is_active', true)
-      .order('display_order', { ascending: true });
-    if (error) return { error: error.message };
-    return { data };
+    return this.request('/bundles?active=true');
   }
 
   async getAdminBundles() {
-    const { supabase } = await import('@/integrations/supabase/client');
-    const { data, error } = await supabase
-      .from('bundles')
-      .select('*')
-      .order('display_order', { ascending: true });
-    if (error) return { error: error.message };
-    return { data };
+    return this.request('/bundles');
   }
 
   async createBundle(bundle: { name: string; image_url: string; min_items: number; is_active: boolean; display_order: number }) {
-    const { supabase } = await import('@/integrations/supabase/client');
-    const { data, error } = await supabase.from('bundles').insert(bundle).select().single();
-    if (error) return { error: error.message };
-    return { data };
+    return this.request('/bundles', {
+      method: 'POST',
+      body: JSON.stringify(bundle),
+    });
   }
 
   async updateBundle(id: string, bundle: Partial<{ name: string; image_url: string; min_items: number; is_active: boolean; display_order: number }>) {
-    const { supabase } = await import('@/integrations/supabase/client');
-    const { data, error } = await supabase.from('bundles').update(bundle).eq('id', id).select().single();
-    if (error) return { error: error.message };
-    return { data };
+    return this.request(`/bundles/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(bundle),
+    });
   }
 
   async deleteBundle(id: string) {
-    const { supabase } = await import('@/integrations/supabase/client');
-    const { error } = await supabase.from('bundles').delete().eq('id', id);
-    if (error) return { error: error.message };
-    return { data: true };
+    return this.request(`/bundles/${id}`, {
+      method: 'DELETE',
+    });
   }
+
 }
 
 export const api = new ApiClient(API_BASE_URL);
